@@ -5,6 +5,7 @@ use settings::Settings;
 use std::process::Command;
 
 mod settings;
+mod launch;
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
