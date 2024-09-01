@@ -1,24 +1,48 @@
-use std::path::Path;
-
 use eframe::egui;
 
+use crate::traits::TabScreen;
+
 pub struct Settings {
-    ports: Box<Vec<SrcPort>>
+    ports: Vec<SrcPort>,
+    port_name_field: String,
+    port_path_field: String
 }
 
 struct SrcPort {
-    name: Box<String>,
-    path: Box<Path>
+    name: String,
+    path: String
 }
 
-impl Settings {
-    pub fn new() -> Self {
-        Self { ports: Box::new(vec![]) }
+impl TabScreen for Settings {
+    fn new() -> Self {
+        Self {
+            ports: vec![],
+            port_name_field: String::new(),
+            port_path_field: String::new()
+        }
     }
 
-    pub fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(&ctx, |ui| {
-            ui.label("settings page");
+            ui.label("Ports");
+            ui.separator();
+            ui.vertical(|ui| {
+                for p in &self.ports {
+                    ui.label(format!("{} ({})", p.name, p.path));
+                }
+            });
+
+            ui.text_edit_singleline(&mut self.port_name_field);
+            ui.text_edit_singleline(&mut self.port_path_field);
+
+            if ui.button("add").clicked() {
+                let port = SrcPort {
+                    name: self.port_name_field.clone(),
+                    path: self.port_path_field.clone()
+                };
+
+                self.ports.push(port);
+            }
         });
     }
 }
