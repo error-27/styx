@@ -1,33 +1,26 @@
 use eframe::egui;
 
-use crate::traits::TabScreen;
+use crate::{traits::TabScreen, AppSettings, SrcPort};
 
-pub struct Settings {
-    ports: Vec<SrcPort>,
+pub struct SettingsPage {
     port_name_field: String,
     port_path_field: String
 }
 
-struct SrcPort {
-    name: String,
-    path: String
-}
-
-impl TabScreen for Settings {
+impl TabScreen for SettingsPage {
     fn new() -> Self {
         Self {
-            ports: vec![],
             port_name_field: String::new(),
             port_path_field: String::new()
         }
     }
 
-    fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
+    fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame, settings: &mut AppSettings) {
         egui::CentralPanel::default().show(&ctx, |ui| {
             ui.label("Ports");
             ui.separator();
             ui.vertical(|ui| {
-                for p in &self.ports {
+                for p in &settings.ports {
                     ui.label(format!("{} ({})", p.name, p.path));
                 }
             });
@@ -41,7 +34,7 @@ impl TabScreen for Settings {
                     path: self.port_path_field.clone()
                 };
 
-                self.ports.push(port);
+                settings.ports.push(port);
             }
         });
     }

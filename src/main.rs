@@ -1,8 +1,8 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use eframe::egui;
-use home::Home;
-use settings::Settings;
+use eframe::{egui, App};
+use home::HomePage;
+use settings::SettingsPage;
 use traits::TabScreen;
 
 mod home;
@@ -30,18 +30,29 @@ enum AppTab {
     SETTINGS
 }
 
+struct AppSettings {
+    ports: Vec<SrcPort>
+}
+
+pub struct SrcPort {
+    name: String,
+    path: String
+}
+
 struct Styx {
+    settings: AppSettings,
     tab: AppTab,
-    home: Home,
-    settings: Settings
+    home_p: HomePage,
+    settings_p: SettingsPage
 }
 
 impl Default for Styx {
     fn default() -> Self {
         Self {
+            settings: AppSettings { ports: vec![] },
             tab: AppTab::HOME,
-            home: Home::new(),
-            settings: Settings::new()
+            home_p: HomePage::new(),
+            settings_p: SettingsPage::new()
         }
     }
 }
@@ -59,10 +70,10 @@ impl eframe::App for Styx {
         // render corresponding tab screen
         match self.tab {
             AppTab::HOME => {
-                self.home.show(ctx, frame)
+                self.home_p.show(ctx, frame, &mut self.settings)
             },
             AppTab::SETTINGS => {
-                self.settings.show(ctx, frame)
+                self.settings_p.show(ctx, frame, &mut self.settings)
             }
         }
     }
