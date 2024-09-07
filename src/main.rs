@@ -6,8 +6,8 @@ use settings::SettingsPage;
 use traits::TabScreen;
 
 mod home;
-mod settings;
 mod launch;
+mod settings;
 mod traits;
 
 fn main() -> eframe::Result {
@@ -15,44 +15,42 @@ fn main() -> eframe::Result {
         viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
         ..Default::default()
     };
-    eframe::run_native(
-        "styx",
-        options,
-        Box::new(|cc| {
-            Ok(Box::<Styx>::default())
-        })
-    )
+    eframe::run_native("styx", options, Box::new(|cc| Ok(Box::<Styx>::default())))
 }
 
 #[derive(PartialEq)]
 enum AppTab {
     HOME,
-    SETTINGS
+    SETTINGS,
 }
 
 struct AppSettings {
-    ports: Vec<SrcPort>
+    ports: Vec<NamedPath>,
+    iwads: Vec<NamedPath>,
 }
 
-pub struct SrcPort {
+pub struct NamedPath {
     name: String,
-    path: String
+    path: String,
 }
 
 struct Styx {
     settings: AppSettings,
     tab: AppTab,
     home_p: HomePage,
-    settings_p: SettingsPage
+    settings_p: SettingsPage,
 }
 
 impl Default for Styx {
     fn default() -> Self {
         Self {
-            settings: AppSettings { ports: vec![] },
+            settings: AppSettings {
+                ports: vec![],
+                iwads: vec![],
+            },
             tab: AppTab::HOME,
             home_p: HomePage::new(),
-            settings_p: SettingsPage::new()
+            settings_p: SettingsPage::new(),
         }
     }
 }
@@ -69,12 +67,8 @@ impl eframe::App for Styx {
 
         // render corresponding tab screen
         match self.tab {
-            AppTab::HOME => {
-                self.home_p.show(ctx, frame, &mut self.settings)
-            },
-            AppTab::SETTINGS => {
-                self.settings_p.show(ctx, frame, &mut self.settings)
-            }
+            AppTab::HOME => self.home_p.show(ctx, frame, &mut self.settings),
+            AppTab::SETTINGS => self.settings_p.show(ctx, frame, &mut self.settings),
         }
     }
 }
