@@ -17,7 +17,7 @@ impl TabScreen for HomePage {
 
     fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame, settings: &mut AppSettings) {
         egui::CentralPanel::default().show(ctx, |ui| {
-            egui::ComboBox::from_label("Selected Port:")
+            egui::ComboBox::from_label("Selected Port")
                 .selected_text({
                     if settings.ports.len() > 0 {
                         settings.ports[self.selected_port].name.clone()
@@ -31,7 +31,7 @@ impl TabScreen for HomePage {
                     }
                 });
 
-            egui::ComboBox::from_label("Selected Game:")
+            egui::ComboBox::from_label("Selected Game")
                 .selected_text({
                     if settings.iwads.len() > 0 {
                         settings.iwads[self.selected_iwad].name.clone()
