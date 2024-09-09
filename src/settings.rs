@@ -8,6 +8,8 @@ pub struct SettingsPage {
     port_path_field: String,
     iwad_name_field: String,
     iwad_path_field: String,
+    pwad_name_field: String,
+    pwad_path_field: String,
 }
 
 impl TabScreen for SettingsPage {
@@ -17,11 +19,14 @@ impl TabScreen for SettingsPage {
             port_path_field: String::new(),
             iwad_name_field: String::new(),
             iwad_path_field: String::new(),
+            pwad_name_field: String::new(),
+            pwad_path_field: String::new(),
         }
     }
 
     fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame, settings: &mut AppSettings) {
         egui::CentralPanel::default().show(&ctx, |ui| {
+            // ----- SOURCE PORTS -----
             ui.label("Ports");
             ui.separator();
             ui.vertical(|ui| {
@@ -57,6 +62,8 @@ impl TabScreen for SettingsPage {
 
             ui.separator();
 
+            // ----- IWADS -----
+
             ui.label("Games");
             ui.separator();
             ui.vertical(|ui| {
@@ -90,6 +97,45 @@ impl TabScreen for SettingsPage {
                 settings.iwads.push(iwad);
                 self.iwad_name_field = String::new();
                 self.iwad_path_field = String::new();
+            }
+
+            ui.separator();
+
+            // ----- PWADS -----
+
+            ui.label("Mods");
+            ui.separator();
+            ui.vertical(|ui| {
+                for i in &settings.pwads {
+                    ui.label(format!("{} ({})", i.name, i.path));
+                }
+            });
+
+            ui.horizontal(|ui| {
+                ui.label("Name");
+                ui.text_edit_singleline(&mut self.pwad_name_field);
+            });
+            ui.horizontal(|ui| {
+                ui.label("Path");
+                ui.text_edit_singleline(&mut self.pwad_path_field);
+                if ui.button("Open").clicked() {
+                    let file = FileDialog::new()
+                        .add_filter("WAD", &["wad", "WAD"])
+                        .pick_file();
+
+                    self.pwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                }
+            });
+
+            if ui.button("add").clicked() {
+                let pwad = NamedPath {
+                    path: self.pwad_path_field.clone(),
+                    name: self.pwad_name_field.clone(),
+                };
+
+                settings.pwads.push(pwad);
+                self.pwad_name_field = String::new();
+                self.pwad_path_field = String::new();
             }
         });
     }

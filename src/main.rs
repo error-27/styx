@@ -12,7 +12,7 @@ mod traits;
 
 fn main() -> eframe::Result {
     let options = eframe::NativeOptions {
-        viewport: egui::ViewportBuilder::default().with_inner_size([320.0, 240.0]),
+        viewport: egui::ViewportBuilder::default().with_inner_size([450.0, 450.0]),
         ..Default::default()
     };
     eframe::run_native("styx", options, Box::new(|cc| Ok(Box::<Styx>::default())))
@@ -27,6 +27,7 @@ enum AppTab {
 struct AppSettings {
     ports: Vec<NamedPath>,
     iwads: Vec<NamedPath>,
+    pwads: Vec<NamedPath>,
 }
 
 pub struct NamedPath {
@@ -47,6 +48,7 @@ impl Default for Styx {
             settings: AppSettings {
                 ports: vec![],
                 iwads: vec![],
+                pwads: vec![],
             },
             tab: AppTab::HOME,
             home_p: HomePage::new(),
