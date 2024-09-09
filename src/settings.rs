@@ -1,4 +1,5 @@
 use eframe::egui;
+use rfd::FileDialog;
 
 use crate::{traits::TabScreen, AppSettings, NamedPath};
 
@@ -36,6 +37,11 @@ impl TabScreen for SettingsPage {
             ui.horizontal(|ui| {
                 ui.label("Path");
                 ui.text_edit_singleline(&mut self.port_path_field);
+                if ui.button("Open").clicked() {
+                    let file = FileDialog::new().pick_file();
+
+                    self.port_path_field = String::from(file.unwrap().to_str().unwrap());
+                }
             });
 
             if ui.button("add").clicked() {
@@ -66,6 +72,13 @@ impl TabScreen for SettingsPage {
             ui.horizontal(|ui| {
                 ui.label("Path");
                 ui.text_edit_singleline(&mut self.iwad_path_field);
+                if ui.button("Open").clicked() {
+                    let file = FileDialog::new()
+                        .add_filter("WAD", &["wad", "WAD"])
+                        .pick_file();
+
+                    self.iwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                }
             });
 
             if ui.button("add").clicked() {
