@@ -1,4 +1,4 @@
 # Styx
-a doom launcher i made lol
+A ZDL inspired Doom launcher.
 
 ## THIS IS NOWHERE NEAR COMPLETE
