@@ -1,3 +1,5 @@
+use std::usize;
+
 use eframe::egui::{self, Color32, Frame, Id, Ui};
 
 use crate::{launch::launch_port, traits::TabScreen, AppSettings, NamedPath};
@@ -5,7 +7,6 @@ use crate::{launch::launch_port, traits::TabScreen, AppSettings, NamedPath};
 pub struct HomePage {
     selected_port: usize,
     selected_iwad: usize,
-    pwad_list: [Vec<usize>; 2],
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -15,17 +16,27 @@ struct PwadInfo {
 }
 
 impl HomePage {
-    fn render_pwad_cols(&mut self, cols: &mut [Ui], pwad_list: &Vec<NamedPath>) {
+    fn render_pwad_cols(
+        &mut self,
+        cols: &mut [Ui],
+        pwad_list: &Vec<NamedPath>,
+        pwad_selection: &mut [Vec<usize>; 2],
+    ) {
         cols[0].label("Mod Pool");
         cols[1].label("Active Mods");
-        for (col_idx, column) in self.pwad_list.clone().into_iter().enumerate() {
+        for (col_idx, column) in pwad_selection.clone().into_iter().enumerate() {
+            if pwad_list.len() == 0 {
+                cols[col_idx].label("No Mods Added");
+                continue;
+            }
+
             let mut from = None;
             let mut to = None;
 
             let frame = Frame::default().inner_margin(4.0);
 
-            let (_, dropped) = cols[col_idx].dnd_drop_zone::<PwadInfo, ()>(frame, |ui| {
-                for (row_idx, item) in self.pwad_list.iter().enumerate() {
+            let (_, dropped_payload) = cols[col_idx].dnd_drop_zone::<PwadInfo, ()>(frame, |ui| {
+                for (row_idx, item) in column.iter().enumerate() {
                     let item_id = Id::new(("pwad_list_dnd", col_idx, row_idx));
                     let item_info = PwadInfo {
                         col: col_idx,
@@ -34,7 +45,7 @@ impl HomePage {
 
                     let response = ui
                         .dnd_drag_source(item_id, item_info, |ui| {
-                            ui.label(pwad_list[column[row_idx]].name.clone());
+                            ui.label(pwad_list[*item].name.clone());
                         })
                         .response;
 
@@ -66,6 +77,26 @@ impl HomePage {
                     }
                 }
             });
+            if let Some(dragged_payload) = dropped_payload {
+                from = Some(dragged_payload);
+                to = Some(PwadInfo {
+                    col: col_idx,
+                    row: usize::MAX,
+                });
+            }
+
+            if let (Some(from), Some(mut to)) = (from, to) {
+                if from.col == to.col {
+                    // Adjust index if re-ordering
+                    to.row -= (from.row < to.row) as usize;
+                }
+
+                let item = pwad_selection[from.col].remove(from.row);
+
+                let c = &mut pwad_selection[to.col];
+                to.row = to.row.min(c.len());
+                c.insert(to.row, item);
+            }
         }
     }
 }
@@ -75,7 +106,6 @@ impl TabScreen for HomePage {
         Self {
             selected_port: 0,
             selected_iwad: 0,
-            pwad_list: [vec![], vec![]],
         }
     }
 
@@ -110,7 +140,7 @@ impl TabScreen for HomePage {
                 });
 
             ui.columns(2, |columns| {
-                self.render_pwad_cols(columns, &settings.pwads);
+                self.render_pwad_cols(columns, &settings.pwads, &mut settings.pwad_selection);
             });
 
             if ui.button("Play").clicked() {
