@@ -147,6 +147,10 @@ impl TabScreen for HomePage {
                 launch_port(
                     settings.ports[self.selected_port].path.clone(),
                     settings.iwads[self.selected_iwad].path.clone(),
+                    settings.pwad_selection[1]
+                        .iter()
+                        .map(|f| settings.pwads[*f].path.clone())
+                        .collect(),
                 );
             }
         });
