@@ -134,6 +134,7 @@ impl TabScreen for SettingsPage {
                 };
 
                 settings.pwads.push(pwad);
+                settings.pwad_selection[0].push(settings.pwads.len() - 1);
                 self.pwad_name_field = String::new();
                 self.pwad_path_field = String::new();
             }

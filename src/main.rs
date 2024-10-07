@@ -28,8 +28,10 @@ struct AppSettings {
     ports: Vec<NamedPath>,
     iwads: Vec<NamedPath>,
     pwads: Vec<NamedPath>,
+    pwad_selection: [Vec<usize>; 2],
 }
 
+#[derive(Clone)]
 pub struct NamedPath {
     name: String,
     path: String,
@@ -49,6 +51,7 @@ impl Default for Styx {
                 ports: vec![],
                 iwads: vec![],
                 pwads: vec![],
+                pwad_selection: [vec![], vec![]],
             },
             tab: AppTab::HOME,
             home_p: HomePage::new(),

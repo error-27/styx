@@ -15,10 +15,6 @@ struct PwadInfo {
 }
 
 impl HomePage {
-    pub fn init(&mut self, settings: &AppSettings) {
-        self.pwad_list = [Vec::from_iter(0..settings.pwads.len()), vec![]];
-    }
-
     fn render_pwad_cols(&mut self, cols: &mut [Ui], pwad_list: &Vec<NamedPath>) {
         cols[0].label("Mod Pool");
         cols[1].label("Active Mods");
