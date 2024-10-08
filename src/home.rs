@@ -22,6 +22,7 @@ impl HomePage {
         pwad_list: &Vec<NamedPath>,
         pwad_selection: &mut [Vec<usize>; 2],
     ) {
+        // Most of this is taken from the official egui examples
         cols[0].label("Mod Pool");
         cols[1].label("Active Mods");
         for (col_idx, column) in pwad_selection.clone().into_iter().enumerate() {
@@ -31,9 +32,12 @@ impl HomePage {
             let frame = Frame::default().inner_margin(4.0);
 
             let (_, dropped_payload) = cols[col_idx].dnd_drop_zone::<PwadInfo, ()>(frame, |ui| {
+                // Render placeholder when no mods in this column
                 if pwad_selection[col_idx].len() == 0 {
                     ui.label("None");
                 }
+
+                // Render each item of a column, and make them interactable
                 for (row_idx, item) in column.iter().enumerate() {
                     let item_id = Id::new(("pwad_list_dnd", col_idx, row_idx));
                     let item_info = PwadInfo {
@@ -137,6 +141,7 @@ impl TabScreen for HomePage {
                     }
                 });
 
+            // Mod selection area
             ui.columns(2, |columns| {
                 self.render_pwad_cols(columns, &settings.pwads, &mut settings.pwad_selection);
             });
