@@ -1,12 +1,18 @@
 use eframe::egui::{self, Color32, Frame, Id, TextBuffer, Ui};
 
-use crate::{launch::launch_port, traits::TabScreen, AppSettings, NamedPath};
+use crate::{
+    launch::{launch_port, LaunchOptions},
+    traits::TabScreen,
+    AppSettings, NamedPath,
+};
 
 pub struct HomePage {
     selected_port: usize,
     selected_iwad: usize,
     complevel: isize,
     custom_cl: bool,
+    launch_toggles: LaunchOptions,
+    turbo_mode: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -135,6 +141,8 @@ impl TabScreen for HomePage {
             selected_iwad: 0,
             complevel: -1,
             custom_cl: false,
+            launch_toggles: LaunchOptions::default(),
+            turbo_mode: false,
         }
     }
 
@@ -211,6 +219,23 @@ impl TabScreen for HomePage {
 
             ui.checkbox(&mut self.custom_cl, "Custom Comp Level");
 
+            egui::CollapsingHeader::new("Other Options").show(ui, |ui| {
+                ui.checkbox(&mut self.launch_toggles.fast, "Fast Monsters");
+                ui.checkbox(&mut self.launch_toggles.pistol, "Pistol Start");
+                ui.checkbox(&mut self.launch_toggles.respawn, "Respawning Monsters");
+
+                ui.horizontal(|ui| {
+                    ui.checkbox(&mut self.turbo_mode, "Turbo Mode");
+                    if self.turbo_mode {
+                        ui.add(
+                            egui::DragValue::new(&mut self.launch_toggles.turbo).range(10..=255),
+                        );
+                    } else if self.launch_toggles.turbo != 0 {
+                        self.launch_toggles.turbo = 0;
+                    }
+                });
+            });
+
             if ui.button("Play").clicked() && settings.ports.len() > 0 && settings.iwads.len() > 0 {
                 launch_port(
                     settings.ports[self.selected_port].path.clone(),
@@ -220,6 +245,7 @@ impl TabScreen for HomePage {
                         .map(|f| settings.pwads[*f].path.clone())
                         .collect(),
                     self.complevel,
+                    self.launch_toggles,
                 );
             }
         });
