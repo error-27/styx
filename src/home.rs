@@ -211,7 +211,7 @@ impl TabScreen for HomePage {
 
             ui.checkbox(&mut self.custom_cl, "Custom Comp Level");
 
-            if ui.button("Play").clicked() {
+            if ui.button("Play").clicked() && settings.ports.len() > 0 && settings.iwads.len() > 0 {
                 launch_port(
                     settings.ports[self.selected_port].path.clone(),
                     settings.iwads[self.selected_iwad].path.clone(),
