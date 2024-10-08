@@ -25,17 +25,15 @@ impl HomePage {
         cols[0].label("Mod Pool");
         cols[1].label("Active Mods");
         for (col_idx, column) in pwad_selection.clone().into_iter().enumerate() {
-            if pwad_list.len() == 0 {
-                cols[col_idx].label("No Mods Added");
-                continue;
-            }
-
             let mut from = None;
             let mut to = None;
 
             let frame = Frame::default().inner_margin(4.0);
 
             let (_, dropped_payload) = cols[col_idx].dnd_drop_zone::<PwadInfo, ()>(frame, |ui| {
+                if pwad_selection[col_idx].len() == 0 {
+                    ui.label("None");
+                }
                 for (row_idx, item) in column.iter().enumerate() {
                     let item_id = Id::new(("pwad_list_dnd", col_idx, row_idx));
                     let item_info = PwadInfo {
