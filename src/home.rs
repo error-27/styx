@@ -1,18 +1,65 @@
-use std::usize;
-
-use eframe::egui::{self, Color32, Frame, Id, Ui};
+use eframe::egui::{self, Color32, Frame, Id, TextBuffer, Ui};
 
 use crate::{launch::launch_port, traits::TabScreen, AppSettings, NamedPath};
 
 pub struct HomePage {
     selected_port: usize,
     selected_iwad: usize,
+    complevel: usize,
+    custom_cl: bool,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 struct PwadInfo {
     col: usize,
     row: usize,
+}
+
+const COMPLEVEL_STRINGS: [&str; 22] = [
+    "Doom v1.2",
+    "Doom v1.666",
+    "Doom v1.9 / Doom 2",
+    "The Ultimate Doom",
+    "Final Doom",
+    "DOSDoom",
+    "TASDoom",
+    "Boom (Broken Vanilla Compat)",
+    "Boom v2.01",
+    "Boom v2.02",
+    "LxDoom",
+    "MBF",
+    "PrBoom v2.03beta",
+    "PrBoom v2.1.0",
+    "PrBoom v2.1.1 - 2.2.6",
+    "PrBoom v2.3.x",
+    "PrBoom v2.4.0",
+    "Engine Defaults",
+    "",
+    "",
+    "",
+    "MBF21",
+];
+
+enum Complevel {
+    Doom1_2 = 0,
+    Doom1_666 = 1,
+    Doom2 = 2,
+    UltDoom = 3,
+    FinDoom = 4,
+    DOSDoom = 5,
+    TASDoom = 6,
+    BoomVanilla = 7,
+    Boom2_01 = 8,
+    Boom = 9,
+    LxDoom = 10,
+    MBF = 11,
+    PrBoom2_03 = 12,
+    PrBoom2_1_0 = 13,
+    PrBoom2_1_1 = 14,
+    PrBoom2_3 = 15,
+    PrBoom2_4 = 16,
+    Defaults = 17,
+    MBF21 = 21,
 }
 
 impl HomePage {
@@ -108,6 +155,8 @@ impl TabScreen for HomePage {
         Self {
             selected_port: 0,
             selected_iwad: 0,
+            complevel: 2,
+            custom_cl: false,
         }
     }
 
@@ -145,6 +194,33 @@ impl TabScreen for HomePage {
             ui.columns(2, |columns| {
                 self.render_pwad_cols(columns, &settings.pwads, &mut settings.pwad_selection);
             });
+
+            // Complevel selector
+            if !self.custom_cl {
+                if self.complevel > 21 || [18, 19, 20].contains(&self.complevel) {
+                    self.complevel = 2;
+                }
+                egui::ComboBox::from_label("Compatibility Level")
+                    .selected_text(format!(
+                        "{}: {}",
+                        self.complevel, COMPLEVEL_STRINGS[self.complevel]
+                    ))
+                    .show_ui(ui, |ui| {
+                        for (i, c) in COMPLEVEL_STRINGS.into_iter().enumerate() {
+                            if c == "" {
+                                continue;
+                            }
+                            ui.selectable_value(&mut self.complevel, i, format!("{}: {}", i, c));
+                        }
+                    });
+            } else {
+                ui.horizontal(|ui| {
+                    ui.add(egui::DragValue::new(&mut self.complevel).speed(0.1));
+                    ui.label("Compatibility Level");
+                });
+            }
+
+            ui.checkbox(&mut self.custom_cl, "Custom Comp Level");
 
             if ui.button("Play").clicked() {
                 launch_port(
