@@ -49,7 +49,7 @@ impl TabScreen for SettingsPage {
                 }
             });
 
-            if ui.button("add").clicked() {
+            if ui.button("Add").clicked() {
                 let port = NamedPath {
                     name: self.port_name_field.clone(),
                     path: self.port_path_field.clone(),
@@ -88,7 +88,7 @@ impl TabScreen for SettingsPage {
                 }
             });
 
-            if ui.button("add").clicked() {
+            if ui.button("Add").clicked() {
                 let iwad = NamedPath {
                     path: self.iwad_path_field.clone(),
                     name: self.iwad_name_field.clone(),
@@ -127,7 +127,7 @@ impl TabScreen for SettingsPage {
                 }
             });
 
-            if ui.button("add").clicked() {
+            if ui.button("Add").clicked() {
                 let pwad = NamedPath {
                     path: self.pwad_path_field.clone(),
                     name: self.pwad_name_field.clone(),
