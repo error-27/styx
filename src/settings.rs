@@ -45,7 +45,9 @@ impl TabScreen for SettingsPage {
                 if ui.button("Open").clicked() {
                     let file = FileDialog::new().pick_file();
 
-                    self.port_path_field = String::from(file.unwrap().to_str().unwrap());
+                    if file.is_some() {
+                        self.port_path_field = String::from(file.unwrap().to_str().unwrap());
+                    }
                 }
             });
 
@@ -84,7 +86,9 @@ impl TabScreen for SettingsPage {
                         .add_filter("WAD", &["wad", "WAD"])
                         .pick_file();
 
-                    self.iwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                    if file.is_some() {
+                        self.iwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                    }
                 }
             });
 
@@ -123,7 +127,9 @@ impl TabScreen for SettingsPage {
                         .add_filter("WAD", &["wad", "WAD"])
                         .pick_file();
 
-                    self.pwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                    if file.is_some() {
+                        self.pwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                    }
                 }
             });
 
