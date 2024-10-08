@@ -1,4 +1,6 @@
-use eframe::egui;
+use std::fmt::format;
+
+use eframe::egui::{self, Color32, Ui};
 use rfd::FileDialog;
 
 use crate::{traits::TabScreen, AppSettings, NamedPath};
@@ -29,11 +31,8 @@ impl TabScreen for SettingsPage {
             // ----- SOURCE PORTS -----
             ui.label("Ports");
             ui.separator();
-            ui.vertical(|ui| {
-                for p in &settings.ports {
-                    ui.label(format!("{} ({})", p.name, p.path));
-                }
-            });
+
+            path_list_viewer(ui, &mut settings.ports, "port_list");
 
             ui.horizontal(|ui| {
                 ui.label("Name");
@@ -68,11 +67,8 @@ impl TabScreen for SettingsPage {
 
             ui.label("Games");
             ui.separator();
-            ui.vertical(|ui| {
-                for i in &settings.iwads {
-                    ui.label(format!("{} ({})", i.name, i.path));
-                }
-            });
+
+            path_list_viewer(ui, &mut settings.iwads, "iwad_list");
 
             ui.horizontal(|ui| {
                 ui.label("Name");
@@ -109,11 +105,8 @@ impl TabScreen for SettingsPage {
 
             ui.label("Mods");
             ui.separator();
-            ui.vertical(|ui| {
-                for i in &settings.pwads {
-                    ui.label(format!("{} ({})", i.name, i.path));
-                }
-            });
+
+            path_list_viewer(ui, &mut settings.pwads, "pwad_list");
 
             ui.horizontal(|ui| {
                 ui.label("Name");
@@ -146,4 +139,33 @@ impl TabScreen for SettingsPage {
             }
         });
     }
+}
+
+fn path_list_viewer(ui: &mut Ui, list: &mut Vec<NamedPath>, name: &str) {
+    egui::ScrollArea::vertical()
+        .id_source(format!("scrollplviewer{}", name))
+        .max_height(100.0)
+        .max_width(300.0)
+        .auto_shrink(false)
+        .show(ui, |ui| {
+            let rect = ui.max_rect();
+            if ui.is_rect_visible(rect) {
+                let stroke = egui::Stroke::new(1.0, Color32::WHITE);
+
+                ui.painter().rect_stroke(rect, 0.5, stroke);
+            }
+            egui::Grid::new(name)
+                .num_columns(2)
+                .spacing([40.0, 4.0])
+                .striped(true)
+                .show(ui, |ui| {
+                    for (i, j) in list.clone().into_iter().enumerate() {
+                        ui.label(format!("{} ({})", j.name, j.path));
+                        if ui.button("Delete").clicked() {
+                            list.remove(i);
+                        }
+                        ui.end_row();
+                    }
+                });
+        });
 }
