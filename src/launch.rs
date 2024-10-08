@@ -8,7 +8,7 @@ pub struct LaunchOptions {
     fast: bool,
 }
 
-pub fn launch_port(port: String, iwad: String, pwads: Vec<String>) {
+pub fn launch_port(port: String, iwad: String, pwads: Vec<String>, complevel: isize) {
     let mut command = Command::new(port);
 
     command.arg("-iwad").arg(iwad);
@@ -18,6 +18,10 @@ pub fn launch_port(port: String, iwad: String, pwads: Vec<String>) {
         for p in pwads {
             command.arg(p);
         }
+    }
+
+    if complevel != -1 {
+        command.arg("-complevel").arg(complevel.to_string());
     }
 
     let out = command.output().expect("failed to run doom");

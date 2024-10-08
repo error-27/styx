@@ -219,6 +219,7 @@ impl TabScreen for HomePage {
                         .iter()
                         .map(|f| settings.pwads[*f].path.clone())
                         .collect(),
+                    self.complevel,
                 );
             }
         });
