@@ -124,7 +124,7 @@ impl TabScreen for SettingsPage {
                 ui.text_edit_singleline(&mut self.pwad_path_field);
                 if ui.button("Open").clicked() {
                     let file = FileDialog::new()
-                        .add_filter("WAD", &["wad", "WAD"])
+                        .add_filter("Doom Mod", &["wad", "WAD", "deh", "DEH"])
                         .pick_file();
 
                     if file.is_some() {
