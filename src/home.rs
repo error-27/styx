@@ -13,6 +13,7 @@ pub struct HomePage {
     custom_cl: bool,
     launch_toggles: LaunchOptions,
     turbo_mode: bool,
+    other_launch_opts: String,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -143,6 +144,7 @@ impl TabScreen for HomePage {
             custom_cl: false,
             launch_toggles: LaunchOptions::default(),
             turbo_mode: false,
+            other_launch_opts: String::new(),
         }
     }
 
@@ -234,6 +236,10 @@ impl TabScreen for HomePage {
                         self.launch_toggles.turbo = 0;
                     }
                 });
+
+                let other_opts_label = ui.label("Other Launch Options");
+                ui.text_edit_singleline(&mut self.other_launch_opts)
+                    .labelled_by(other_opts_label.id);
             });
 
             if ui.button("Play").clicked() && settings.ports.len() > 0 && settings.iwads.len() > 0 {
@@ -246,6 +252,7 @@ impl TabScreen for HomePage {
                         .collect(),
                     self.complevel,
                     self.launch_toggles,
+                    self.other_launch_opts.clone(),
                 );
             }
         });

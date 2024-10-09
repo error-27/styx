@@ -28,6 +28,7 @@ pub fn launch_port(
     pwads: Vec<String>,
     complevel: isize,
     opts: LaunchOptions,
+    other_args: String,
 ) {
     let mut command = Command::new(port);
 
@@ -55,6 +56,11 @@ pub fn launch_port(
     }
     if opts.turbo != 0 {
         command.arg("-turbo").arg(opts.turbo.to_string());
+    }
+
+    if other_args != String::new() {
+        let arg_list = other_args.split(" ");
+        command.args(arg_list);
     }
 
     let out = command.output().expect("failed to run doom");
