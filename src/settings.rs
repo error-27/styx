@@ -1,6 +1,4 @@
-use std::fmt::format;
-
-use eframe::egui::{self, Color32, ScrollArea, Ui};
+use eframe::egui::{self, Color32, Ui};
 use rfd::FileDialog;
 
 use crate::{traits::TabScreen, AppSettings, NamedPath};
