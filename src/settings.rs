@@ -1,6 +1,6 @@
 use std::fmt::format;
 
-use eframe::egui::{self, Color32, Ui};
+use eframe::egui::{self, Color32, ScrollArea, Ui};
 use rfd::FileDialog;
 
 use crate::{traits::TabScreen, AppSettings, NamedPath};
@@ -28,115 +28,117 @@ impl TabScreen for SettingsPage {
 
     fn show(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame, settings: &mut AppSettings) {
         egui::CentralPanel::default().show(&ctx, |ui| {
-            // ----- SOURCE PORTS -----
-            ui.label("Ports");
-            ui.separator();
+            egui::ScrollArea::vertical().show(ui, |ui| {
+                // ----- SOURCE PORTS -----
+                ui.label("Ports");
+                ui.separator();
 
-            path_list_viewer(ui, &mut settings.ports, "port_list");
+                path_list_viewer(ui, &mut settings.ports, "port_list");
 
-            ui.horizontal(|ui| {
-                ui.label("Name");
-                ui.text_edit_singleline(&mut self.port_name_field);
-            });
-            ui.horizontal(|ui| {
-                ui.label("Path");
-                ui.text_edit_singleline(&mut self.port_path_field);
-                if ui.button("Open").clicked() {
-                    let file = FileDialog::new().pick_file();
+                ui.horizontal(|ui| {
+                    ui.label("Name");
+                    ui.text_edit_singleline(&mut self.port_name_field);
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Path");
+                    ui.text_edit_singleline(&mut self.port_path_field);
+                    if ui.button("Open").clicked() {
+                        let file = FileDialog::new().pick_file();
 
-                    if file.is_some() {
-                        self.port_path_field = String::from(file.unwrap().to_str().unwrap());
+                        if file.is_some() {
+                            self.port_path_field = String::from(file.unwrap().to_str().unwrap());
+                        }
                     }
+                });
+
+                if ui.button("Add").clicked() {
+                    let port = NamedPath {
+                        name: self.port_name_field.clone(),
+                        path: self.port_path_field.clone(),
+                    };
+
+                    settings.ports.push(port);
+                    self.port_name_field = String::new();
+                    self.port_path_field = String::new();
+                }
+
+                ui.separator();
+
+                // ----- IWADS -----
+
+                ui.label("Games");
+                ui.separator();
+
+                path_list_viewer(ui, &mut settings.iwads, "iwad_list");
+
+                ui.horizontal(|ui| {
+                    ui.label("Name");
+                    ui.text_edit_singleline(&mut self.iwad_name_field);
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Path");
+                    ui.text_edit_singleline(&mut self.iwad_path_field);
+                    if ui.button("Open").clicked() {
+                        let file = FileDialog::new()
+                            .add_filter("WAD", &["wad", "WAD"])
+                            .pick_file();
+
+                        if file.is_some() {
+                            self.iwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                        }
+                    }
+                });
+
+                if ui.button("Add").clicked() {
+                    let iwad = NamedPath {
+                        path: self.iwad_path_field.clone(),
+                        name: self.iwad_name_field.clone(),
+                    };
+
+                    settings.iwads.push(iwad);
+                    self.iwad_name_field = String::new();
+                    self.iwad_path_field = String::new();
+                }
+
+                ui.separator();
+
+                // ----- PWADS -----
+
+                ui.label("Mods");
+                ui.separator();
+
+                path_list_viewer(ui, &mut settings.pwads, "pwad_list");
+
+                ui.horizontal(|ui| {
+                    ui.label("Name");
+                    ui.text_edit_singleline(&mut self.pwad_name_field);
+                });
+                ui.horizontal(|ui| {
+                    ui.label("Path");
+                    ui.text_edit_singleline(&mut self.pwad_path_field);
+                    if ui.button("Open").clicked() {
+                        let file = FileDialog::new()
+                            .add_filter("Doom Mod", &["wad", "WAD", "deh", "DEH"])
+                            .pick_file();
+
+                        if file.is_some() {
+                            self.pwad_path_field = String::from(file.unwrap().to_str().unwrap());
+                        }
+                    }
+                });
+
+                if ui.button("Add").clicked() {
+                    let pwad = NamedPath {
+                        path: self.pwad_path_field.clone(),
+                        name: self.pwad_name_field.clone(),
+                    };
+
+                    settings.pwads.push(pwad);
+                    settings.pwad_selection[0].push(settings.pwads.len() - 1);
+                    self.pwad_name_field = String::new();
+                    self.pwad_path_field = String::new();
                 }
             });
-
-            if ui.button("Add").clicked() {
-                let port = NamedPath {
-                    name: self.port_name_field.clone(),
-                    path: self.port_path_field.clone(),
-                };
-
-                settings.ports.push(port);
-                self.port_name_field = String::new();
-                self.port_path_field = String::new();
-            }
-
-            ui.separator();
-
-            // ----- IWADS -----
-
-            ui.label("Games");
-            ui.separator();
-
-            path_list_viewer(ui, &mut settings.iwads, "iwad_list");
-
-            ui.horizontal(|ui| {
-                ui.label("Name");
-                ui.text_edit_singleline(&mut self.iwad_name_field);
-            });
-            ui.horizontal(|ui| {
-                ui.label("Path");
-                ui.text_edit_singleline(&mut self.iwad_path_field);
-                if ui.button("Open").clicked() {
-                    let file = FileDialog::new()
-                        .add_filter("WAD", &["wad", "WAD"])
-                        .pick_file();
-
-                    if file.is_some() {
-                        self.iwad_path_field = String::from(file.unwrap().to_str().unwrap());
-                    }
-                }
-            });
-
-            if ui.button("Add").clicked() {
-                let iwad = NamedPath {
-                    path: self.iwad_path_field.clone(),
-                    name: self.iwad_name_field.clone(),
-                };
-
-                settings.iwads.push(iwad);
-                self.iwad_name_field = String::new();
-                self.iwad_path_field = String::new();
-            }
-
-            ui.separator();
-
-            // ----- PWADS -----
-
-            ui.label("Mods");
-            ui.separator();
-
-            path_list_viewer(ui, &mut settings.pwads, "pwad_list");
-
-            ui.horizontal(|ui| {
-                ui.label("Name");
-                ui.text_edit_singleline(&mut self.pwad_name_field);
-            });
-            ui.horizontal(|ui| {
-                ui.label("Path");
-                ui.text_edit_singleline(&mut self.pwad_path_field);
-                if ui.button("Open").clicked() {
-                    let file = FileDialog::new()
-                        .add_filter("Doom Mod", &["wad", "WAD", "deh", "DEH"])
-                        .pick_file();
-
-                    if file.is_some() {
-                        self.pwad_path_field = String::from(file.unwrap().to_str().unwrap());
-                    }
-                }
-            });
-
-            if ui.button("Add").clicked() {
-                let pwad = NamedPath {
-                    path: self.pwad_path_field.clone(),
-                    name: self.pwad_name_field.clone(),
-                };
-
-                settings.pwads.push(pwad);
-                settings.pwad_selection[0].push(settings.pwads.len() - 1);
-                self.pwad_name_field = String::new();
-                self.pwad_path_field = String::new();
-            }
         });
     }
 }
