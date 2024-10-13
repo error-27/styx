@@ -5,8 +5,11 @@ use home::HomePage;
 use settings::SettingsPage;
 use traits::TabScreen;
 
+use serde::{Deserialize, Serialize};
+
 mod home;
 mod launch;
+mod serializer;
 mod settings;
 mod traits;
 
@@ -15,7 +18,10 @@ fn main() -> eframe::Result {
         viewport: egui::ViewportBuilder::default().with_inner_size([450.0, 450.0]),
         ..Default::default()
     };
-    eframe::run_native("styx", options, Box::new(|cc| Ok(Box::<Styx>::default())))
+    let mut styx = Box::<Styx>::default();
+    let settings = serializer::load_settings().unwrap();
+    styx.settings = settings;
+    eframe::run_native("styx", options, Box::new(|cc| Ok(styx)))
 }
 
 #[derive(PartialEq)]
@@ -24,6 +30,7 @@ enum AppTab {
     SETTINGS,
 }
 
+#[derive(Serialize, Deserialize)]
 struct AppSettings {
     ports: Vec<NamedPath>,
     iwads: Vec<NamedPath>,
@@ -31,7 +38,7 @@ struct AppSettings {
     pwad_selection: [Vec<usize>; 2],
 }
 
-#[derive(Clone)]
+#[derive(Clone, Serialize, Deserialize)]
 pub struct NamedPath {
     name: String,
     path: String,
@@ -47,15 +54,21 @@ struct Styx {
 impl Default for Styx {
     fn default() -> Self {
         Self {
-            settings: AppSettings {
-                ports: vec![],
-                iwads: vec![],
-                pwads: vec![],
-                pwad_selection: [vec![], vec![]],
-            },
+            settings: AppSettings::default(),
             tab: AppTab::HOME,
             home_p: HomePage::new(),
             settings_p: SettingsPage::new(),
+        }
+    }
+}
+
+impl Default for AppSettings {
+    fn default() -> Self {
+        Self {
+            ports: vec![],
+            iwads: vec![],
+            pwads: vec![],
+            pwad_selection: [vec![], vec![]],
         }
     }
 }
@@ -75,5 +88,9 @@ impl eframe::App for Styx {
             AppTab::HOME => self.home_p.show(ctx, frame, &mut self.settings),
             AppTab::SETTINGS => self.settings_p.show(ctx, frame, &mut self.settings),
         }
+    }
+
+    fn on_exit(&mut self, _gl: Option<&eframe::glow::Context>) {
+        serializer::save_settings(&self.settings);
     }
 }
